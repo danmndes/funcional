@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>VivaBairro</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Daniel Mendes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+</head>
+<body>
+<section class="ftco-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center mb-5">
+                <a href="/"><h2 class="heading-section">VivaBairro</h2></a>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10">
+                <div class="wrap d-md-flex">
+                    <div class="text-wrap p-4 p-lg-5 text-center d-flex align-items-center order-md-last">
+                        <div class="text w-100">
+                            <h2>Bem Vindo!</h2>
+                        </div>
+                    </div>
+                    <div class="login-wrap p-4 p-lg-5">
+                        <div class="d-flex">
+                            <div class="w-100">
+                                <h3 class="mb-4">Criar Conta</h3>
+                            </div>
+                            <div class="w-100">
+                                <p class="social-media d-flex justify-content-end">
+                                    <a href="#" class="social-icon d-flex align-items-center justify-content-center"><span class="fa fa-facebook"></span></a>
+                                    <a href="#" class="social-icon d-flex align-items-center justify-content-center"><span class="fa fa-twitter"></span></a>
+                                </p>
+                            </div>
+                        </div>
+                        <form action="{{ url_for('create_user') }}" method="POST" class="signin-form" id="registerForm">
+                            <div class="form-group mb-3">
+                                <label class="label" for="username">Usuário</label>
+                                <input type="text" class="form-control" name="username" id="username" placeholder="Username" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="label" for="email">Email</label>
+                                <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="label" for="password">Senha</label>
+                                <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="label" for="bairro">Bairro</label>
+                                <select class="form-control" name="bairro" id="bairro" required>
+                                    <option value="">Selecione o bairro</option>
+                                    <option value="Padre Andrade">Padre Andrade</option>
+                                    <!-- Add more options as needed -->
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="label" for="tipo">Tipo</label>
+                                <select class="form-control" name="tipo" id="tipo" required onchange="showHideShopName()">
+                                    <option value="">Selecione o tipo de usuário</option>
+                                    <option value="user">Usuário Padrão</option>
+                                    <option value="merchant">Comerciante</option>
+                                    <option value="charity">Instituição Social</option>
+                                    <!-- Add more options as needed -->
+                                </select>
+                            </div>
+                            <div class="form-group mb-3" id="shopNameField" style="display: none;">
+                                <label class="label" for="shop_name">Nome da Loja</label>
+                                <input type="text" class="form-control" name="shop_name" id="shop_name">
+                                <label class="label" for="atuacao_loja">Área de Atuação</label>
+                                <input type="text" class="form-control" name="atuacao_loja" id="atuacao_loja">
+                            </div>
+                            <div class="form-group mb-3" id="charityNameField" style="display: none;">
+                                <label class="label" for="charity_name">Nome da Instituição</label>
+                                <input type="text" class="form-control" name="charity_name" id="charity_name">
+                                <label class="label" for="atuacao_org">Área de Atuação</label>
+                                <input type="text" class="form-control" name="atuacao_org" id="atuacao_org">
+                            </div>
+                            <div class="form-group mt-3">
+                                <button type="submit" class="form-control btn btn-primary submit px-3">Criar Conta</button>
+                            </div>
+                        </form>
+                        <div id="message" class="alert" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/popper.js')}}"></script>
+<script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/main.js')}}"></script>
+<script>
+    $(document).ready(function() {
+        $('#registerForm').on('submit', function(event) {
+            event.preventDefault();
+            var form = $(this);
+            $.ajax({
+                type: form.attr('method'),
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        $('#message').removeClass('alert-danger').addClass('alert-success').text('Conta criada com sucesso!').show();
+                        setTimeout(() => {
+                            window.location.href = '/'
+                        }, 2500)
+                    } else {
+                        $('#message').removeClass('alert-success').addClass('alert-danger').text(response.error).show();
+                    }
+                },
+                error: function(response) {
+                    $('#message').removeClass('alert-success').addClass('alert-danger').text("Conta não cadastrada. Usuário já existe").show();
+                }
+            });
+        });
+    });
+
+    function showHideShopName() {
+        var tipoDropdown = document.getElementById("tipo");
+        var shopNameField = document.getElementById("shopNameField");
+
+        if (tipoDropdown.value === "merchant") {
+            shopNameField.style.display = "block";
+        } else {
+            shopNameField.style.display = "none";
+        }
+        if (tipoDropdown.value === "charity") {
+            charityNameField.style.display = "block";
+        } else {
+            charityNameField.style.display = "none";
+        }
+    }
+
+</script>
+
+</body>
+</html>
